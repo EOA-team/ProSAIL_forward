@@ -8,3 +8,5 @@ prosail
 scipy
 seaborn
 sklearn
+spart-python
+spectral
