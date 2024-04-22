@@ -180,12 +180,12 @@ if __name__ == '__main__':
   os.chdir(cwd)
 
   # global setup
-  out_dir = Path('../results').joinpath('lut_based_inversion')
+  out_dir = Path('results').joinpath('lut_based_inversion')
   out_dir.mkdir(exist_ok=True)
 
   # spectral response function of Sentinel-2 for resampling PROSAIL output
   fpath_srf = Path(
-      '../data/auxiliary/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.1.xlsx')
+      'data/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.1.xlsx')
   # RTM configurations for lookup-table generation
   rtm_lut_config = {
       'sensor': 'Sentinel2B',
