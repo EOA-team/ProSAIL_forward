@@ -3,9 +3,8 @@
 This repository allows to run the ProSAIL RTM in forward mode and generate Look-Up Tables (LUTs).
 It provides default data and parametrization for running the model for winter wheat in Switzerland and for the Sentinel-2 sensor.
 
-## Usage
 
-### Installation
+## Installation
 
 ```
 git clone https://github.com/EOA-team/ProSAIL_forward.git
@@ -15,7 +14,7 @@ source my_venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Running the code
+## Running the code
 
 To run the RTM, everything is set up in the `simulate_S2_spectra_soil.py` script. 
 
