@@ -200,7 +200,7 @@ if __name__ == '__main__':
   # directory with LUT parameters for different phenological macro-stages
   lut_params_dir = Path('lut_params')
   # Path to soil spectra to use
-  #soil_path = Path('../results/GEE_baresoil_v2/sampled_spectra_all_CH.pkl')
+  soil_path = None #Path('../results/GEE_baresoil_v2/sampled_spectra_all_CH.pkl')
 
   # target trait(s)
   traits = ['lai', 'cab', 'ccc', 'car']
