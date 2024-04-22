@@ -181,7 +181,7 @@ if __name__ == '__main__':
 
   # global setup
   out_dir = Path('results').joinpath('lut_based_inversion')
-  out_dir.mkdir(exist_ok=True)
+  out_dir.mkdir(parents=True, exist_ok=True)
 
   # spectral response function of Sentinel-2 for resampling PROSAIL output
   fpath_srf = Path(
