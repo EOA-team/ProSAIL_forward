@@ -1,0 +1,10 @@
+geopandas
+lhsmdu
+matplotlib
+numba
+numpy
+pandas
+prosail
+scipy
+seaborn
+sklearn
