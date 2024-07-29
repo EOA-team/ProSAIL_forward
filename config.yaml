@@ -1,0 +1,20 @@
+LUT: 
+    lut_params: 'lut_params/prosail_danner-etal_switzerland_soil.csv' # Range and distribution of leaf-canopy variables 'lut_params/prosail_danner-etal_switzerland_nosoil.csv'
+    lut_size : 1000
+    sampling_method: 'FRS'
+    apply_glai_ccc_constraint: false
+    apply_chlorophyll_carotiniod_constraint: false
+    
+
+RTM:
+    sensor : 'Sentinel2A' # 'Sentinel2A' or 'Sentinel2B'
+    fpath_srf : 'data/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.1.xlsx'
+    remove_invalid_green_peaks : true
+    linearize_lai : false
+    
+out_dir : 'results/'
+soil_path : 'data/sampled_spectra_all_CH.pkl' # null
+traits : ['lai', 'cab', 'ccc', 'car']
+
+
+
