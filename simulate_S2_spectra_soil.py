@@ -48,6 +48,26 @@ def get_logger():
   return logger
 
 
+def codistribute_vars(lut, lut_config):
+    """ 
+    Linearly codistribute the variables with LAI based of codsitrbution functions from a table
+
+    :param lut: LookupTable object
+    :param lut_config: dict
+    """
+    if lut_config['codistribution'] is not None:
+      codist = pd.read_csv(lut_config['codistribution'])
+      for i, row in codist.iterrows():
+          param = row['param']
+          Vmin0 = row['Vmin0']
+          Vmax0 = row['Vmax0']
+          VminLAI = row['Vmin(LAImax)']
+          VmaxLAI = row['Vmax(LAImax)']
+          lut._samples[param] = lut._samples[param].apply(lambda x: (x-Vmin0)/(Vmax0-Vmin0)*(VmaxLAI-VminLAI)+VminLAI)
+ 
+    return lut
+
+
 def generate_spectra(
     output_dir: Path,
     lut_params: Path,
@@ -73,14 +93,16 @@ def generate_spectra(
   # generate lookup-table
   trait_str = '-'.join(traits)
   fpath_lut = output_dir.joinpath(
-    f'{pheno_phases}_{trait_str}_lut_no-constraints.pkl') 
+    f'{pheno_phases}_{trait_str}_lut_with-constraints.pkl') 
   print(fpath_lut)
 
   # if LUT exists, continue, else generate it
   if not fpath_lut.exists():
     lut_inp = lut_config.copy()
+    del lut_inp['codistribution']
     lut_inp['lut_params'] = lut_params
     lut = generate_lut(**lut_inp)
+    lut = codistribute_vars(lut, lut_config) # codistribution
     lut = simulate_from_lut(lut, **rtm_config)
 
     # special case CCC (Canopy Chlorophyll Content) ->
@@ -131,14 +153,16 @@ def generate_spectra_soil(
   # generate lookup-table
   trait_str = '-'.join(traits)
   fpath_lut = output_dir.joinpath(
-    f'{pheno_phases}_{trait_str}_lut_no-constraints.pkl') #
+    f'{pheno_phases}_{trait_str}_lut_with-constraints.pkl') #
 
   # if LUT exists, continue, else generate it
   if not fpath_lut.exists():
     # Generate LUT
     lut_inp = lut_config.copy()
+    del lut_inp['codistribution']
     lut_inp['lut_params'] = lut_params
     lut = generate_lut(**lut_inp)
+    lut = codistribute_vars(lut, lut_config) # codistribution
 
     # Simulate with RTM
     rtm_inp = rtm_config.copy()
@@ -248,7 +272,7 @@ if __name__ == '__main__':
   rtm_config = config['RTM']
   soil_path = Path(config['soil_path']) if config['soil_path'] is not None else None 
   traits = config['traits']
-  
+
   
   ########################
   # RUN PROSAIL IN FORWARD MODE
