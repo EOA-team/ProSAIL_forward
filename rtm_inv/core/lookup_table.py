@@ -314,6 +314,7 @@ def generate_lut(
     :returns:
         input parameters and simulated spectra as `DataFrame`.
     """
+
     # read parameters from CSV if not provided as a DataFrame
     if isinstance(lut_params, Path):
         lut_params = pd.read_csv(lut_params)
@@ -341,6 +342,7 @@ def simulate_from_lut(
     rsoil0: Optional[np.array] = None,
     soil_spectrum1: Optional[np.array] = None,
     soil_spectrum2: Optional[np.array] = None,
+    factor = 'SDR'
     ):
 
     """
@@ -381,7 +383,8 @@ def simulate_from_lut(
         remove_invalid_green_peaks=remove_invalid_green_peaks,
         rsoil0=rsoil0,
         soil_spectrum1=soil_spectrum1,
-        soil_spectrum2=soil_spectrum2
+        soil_spectrum2=soil_spectrum2,
+        factor=factor
     )
     # linearize LAI as proposed by Verhoef et al. (2018,
     # https://doi.org/10.1016/j.rse.2017.08.006)

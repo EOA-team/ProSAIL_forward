@@ -86,6 +86,8 @@ def generate_spectra(
     sensor_suffix = '_S2A'  
   elif rtm_config['sensor'] == 'Sentinel2B':
     sensor_suffix = '_S2B'
+  elif rtm_config['sensor'] == 'PlanetSuperDove':
+    sensor_suffix = '_PL'
     
   pheno_phases = \
       lut_params.name.split('.csv')[0] + sensor_suffix
@@ -93,8 +95,8 @@ def generate_spectra(
   # generate lookup-table
   trait_str = '-'.join(traits)
   fpath_lut = output_dir.joinpath(
-    f'{pheno_phases}_{trait_str}_lut_with-constraints.pkl') 
-  print(fpath_lut)
+    f'{pheno_phases}_{trait_str}_lut.pkl') 
+  print('Output path', fpath_lut)
 
   # if LUT exists, continue, else generate it
   if not fpath_lut.exists():
@@ -102,7 +104,8 @@ def generate_spectra(
     del lut_inp['codistribution']
     lut_inp['lut_params'] = lut_params
     lut = generate_lut(**lut_inp)
-    lut = codistribute_vars(lut, lut_config) # codistribution
+    if lut_config['codistribution'] is not None:
+      lut = codistribute_vars(lut, lut_config) # codistribution
     lut = simulate_from_lut(lut, **rtm_config)
 
     # special case CCC (Canopy Chlorophyll Content) ->
@@ -146,6 +149,8 @@ def generate_spectra_soil(
     sensor_suffix = '_S2A'  
   elif rtm_config['sensor'] == 'Sentinel2B':
     sensor_suffix = '_S2B'
+  elif rtm_config['sensor'] == 'PlanetSuperDove':
+    sensor_suffix = '_PL'
   
   pheno_phases = \
       lut_params.name.split('.csv')[0] + sensor_suffix
@@ -153,16 +158,18 @@ def generate_spectra_soil(
   # generate lookup-table
   trait_str = '-'.join(traits)
   fpath_lut = output_dir.joinpath(
-    f'{pheno_phases}_{trait_str}_lut_with-constraints.pkl') #
+    f'{pheno_phases}_{trait_str}_lut.pkl') 
+  print('Output path', fpath_lut)
 
   # if LUT exists, continue, else generate it
   if not fpath_lut.exists():
-    # Generate LUT
+    # Generate LUTd
     lut_inp = lut_config.copy()
     del lut_inp['codistribution']
     lut_inp['lut_params'] = lut_params
     lut = generate_lut(**lut_inp)
-    lut = codistribute_vars(lut, lut_config) # codistribution
+    if lut_config['codistribution'] is not None:
+      lut = codistribute_vars(lut, lut_config) # codistribution
 
     # Simulate with RTM
     rtm_inp = rtm_config.copy()
@@ -177,7 +184,7 @@ def generate_spectra_soil(
       rtm_inp['soil_spectrum1'] = soil_df.iloc[i].values 
       rtm_inp['soil_spectrum2'] = np.zeros_like(soil_df.iloc[i].values) 
       sub_lut = dataframe_to_lookup_table(sub_lut, lut)
-      lut_soilspectra = simulate_from_lut(sub_lut, **rtm_config)
+      lut_soilspectra = simulate_from_lut(sub_lut, **rtm_inp)
       lut_soilspectra.index = original_idx # keep original order
       lut_allsoils.append(lut_soilspectra)
     

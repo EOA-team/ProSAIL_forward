@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import pandas as pd
 import prosail
+import os
 import SPART as spart
 
 from pathlib import Path
@@ -65,6 +66,7 @@ class ProSAILParameters:
 
     prospect5 = ['n', 'cab', 'car', 'cbrown', 'cw', 'cm']
     prospectD = ['n', 'cab', 'car', 'cbrown', 'cw', 'cm', 'ant']
+    prospectPRO = ['n', 'cab', 'car', 'cbrown', 'cw', 'cm', 'ant', 'prot', 'cbc']
     fourSAIL= [
         'lai', 'lidfa', 'lidfb', 'psoil', 'rsoil', \
         'hspot', 'tts', 'tto', 'phi', 'typelidf', \
@@ -178,6 +180,7 @@ class RTM:
         rsoil0: Optional[np.array] = False,
         soil_spectrum1: Optional[np.array] = False,
         soil_spectrum2: Optional[np.array] = False,
+        factor = 'SDR'
     ) -> None:
         """
         Runs the ProSAIL RTM.
@@ -197,13 +200,18 @@ class RTM:
             Should be provided with soil_spectrum2
         :param soil_spectrum2: wet soil spectra. 2101-element array with reflectance values between 400 and 2500nm
         """
+
         # check if Prospect version
+        prospect_version = None  
         if set(ProSAILParameters.prospect5).issubset(set(self._lut.samples.columns)):
             prospect_version = '5'
-        elif set(self._lut.samples.columns).issubset(ProSAILParameters.prospectD):
+        if set(ProSAILParameters.prospectD).issubset(set(self._lut.samples.columns)):
             prospect_version = 'D'
-        else:
+        if set(ProSAILParameters.prospectPRO).issubset(set(self._lut.samples.columns)):
+            prospect_version = 'PRO'
+        if prospect_version is None:
             raise ValueError('Cannot determine Prospect Version')
+        print(f'Running prospect-{prospect_version}')
 
         # get sensor
         try:
@@ -248,6 +256,7 @@ class RTM:
             record_inp = record.to_dict()
             record_inp.update({
                 'prospect_version': prospect_version
+                'factor': factor
             })
             if rsoil0 is not None:
                 record_inp.update({
@@ -260,7 +269,16 @@ class RTM:
                 })
             # run ProSAIL
             try:
-                spectrum = prosail.run_prosail(**record_inp)
+                if factor == 'SDR':
+                    spectrum = prosail.run_prosail(**record_inp)
+                if factor == 'ALLALL':
+                    sail_outputs = prosail.run_prosail(**record_inp)
+                    spectrum, tss, tdd, rsdt, rddt = sail_outputs[17], sail_outputs[0], sail_outputs[4], sail_outputs[13], sail_outputs[12]
+                    wavelengths = np.arange(400, 2501)  # in nm
+                    par_mask = (wavelengths >= 400) & (wavelengths <= 700)
+                    fapar_dir = 1 - tss - np.mean(rsdt[par_mask])
+                    fapar_dif = 1 - np.mean(tdd[par_mask]) - np.mean(rddt[par_mask])
+
             except Exception as e:
                 raise RTMRunTimeError(f'Simulation of spectrum failed: {e}')
             if (idx+1)%self._nstep == 0:
@@ -289,6 +307,11 @@ class RTM:
                 sensor_spectrum = sensor_spectrum[0].values
 
             self._lut.samples.loc[idx,sensor_bands] = sensor_spectrum
+            if factor == 'ALLALL':
+                self._lut.samples.loc[idx,'FAPAR_dir'] = fapar_dir
+                self._lut.samples.loc[idx,'FAPAR_dif'] = fapar_dif
+
+
 
     def simulate_spectra(self, sensor: str, **kwargs) -> pd.DataFrame:
         """
@@ -301,6 +324,7 @@ class RTM:
         :returns:
             lookup-table with RTM simulated spectra as `DataFrame`
         """
+        
         # call different RTMs
         if self._rtm == 'prosail':
             self._run_prosail(sensor=sensor, **kwargs)
