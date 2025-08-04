@@ -244,6 +244,7 @@ class RTM:
             )
         else:
             srf_df = sensor.read_srf_from_xls(fpath_srf)
+            print(srf_df)
 
         # iterate through LUT and run ProSAIL
         spectrum = None
@@ -255,7 +256,7 @@ class RTM:
             # set the PROSPECT version
             record_inp = record.to_dict()
             record_inp.update({
-                'prospect_version': prospect_version
+                'prospect_version': prospect_version,
                 'factor': factor
             })
             if rsoil0 is not None:
@@ -324,7 +325,7 @@ class RTM:
         :returns:
             lookup-table with RTM simulated spectra as `DataFrame`
         """
-        
+
         # call different RTMs
         if self._rtm == 'prosail':
             self._run_prosail(sensor=sensor, **kwargs)
