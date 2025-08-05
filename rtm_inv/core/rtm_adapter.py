@@ -221,7 +221,9 @@ class RTM:
 
         # get band names
         sensor_bands = sensor.band_names
-        self._lut.samples[sensor_bands] = np.nan
+        new_cols = pd.DataFrame(np.nan, index=self._lut.samples.index, columns=sensor_bands)
+        self._lut.samples = pd.concat([self._lut.samples, new_cols], axis=1)
+        #self._lut.samples[sensor_bands] = np.nan
 
         # define centers and bandwidth of ProSAIL output
         centers_prosail = np.arange(400,2501,1)
@@ -244,7 +246,7 @@ class RTM:
             )
         else:
             srf_df = sensor.read_srf_from_xls(fpath_srf)
-            print(srf_df)
+           
 
         # iterate through LUT and run ProSAIL
         spectrum = None
@@ -252,6 +254,7 @@ class RTM:
         # drop band columns B01, B02, etc.
         traits = [x for x in traits if not x.startswith('B')]
         lut = self._lut.samples[traits].copy()
+       
         for idx, record in lut.iterrows():
             # set the PROSPECT version
             record_inp = record.to_dict()
@@ -293,7 +296,7 @@ class RTM:
                 if not valid:
                     self._lut.samples.loc[idx,sensor_bands] = np.nan
                     continue
-
+            
             # resample to the spectral resolution of sensor
             if fpath_srf is None:
                 sensor_spectrum = resampler(spectrum)
@@ -308,6 +311,7 @@ class RTM:
                 sensor_spectrum = sensor_spectrum[0].values
 
             self._lut.samples.loc[idx,sensor_bands] = sensor_spectrum
+            
             if factor == 'ALLALL':
                 self._lut.samples.loc[idx,'FAPAR_dir'] = fapar_dir
                 self._lut.samples.loc[idx,'FAPAR_dif'] = fapar_dif

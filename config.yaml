@@ -1,6 +1,6 @@
 LUT: 
     lut_params: 'lut_params/prosail_danner-etal_switzerland_soil.csv' # Range and distribution of leaf-canopy variables 'lut_params/prosail_danner-etal_switzerland_nosoil.csv'
-    lut_size : 50000
+    lut_size : 10000
     sampling_method: 'FRS'
     apply_glai_ccc_constraint: false
     apply_chlorophyll_carotiniod_constraint: false
@@ -8,13 +8,13 @@ LUT:
     
 
 RTM:
-    sensor : 'Sentinel2B' # 'Sentinel2A' or 'Sentinel2B'
-    fpath_srf : 'data/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.1.xlsx'
+    sensor : 'Hyspex' # among ['Sentinel2A', 'Sentinel2B', 'PlanetSuperDove', 'Hyspex']
+    fpath_srf : 'data/mjolnir_wvl_fwhm.csv' #'data/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.1.xlsx' for Sentinel-2
     remove_invalid_green_peaks : true
     linearize_lai : false
     
-out_dir : 'results/'
-soil_path : 'data/sampled_spectra_all_CH.pkl' # null
+out_dir : 'results'
+soil_path : 'data/sampled_spectra_all_CH.pkl' # or null
 traits : ['lai', 'cab', 'ccc', 'car']
 
 

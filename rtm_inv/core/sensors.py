@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import pandas as pd
+import numpy as np
 
 from copy import deepcopy
 from pathlib import Path
@@ -157,3 +158,44 @@ class Sensors(object):
         band_widths = [
             20, 50, 36, 36, 20, 31, 15, 40
         ]
+
+    class Hyspex:
+        """
+        defines hypersectral drone
+        """
+        num_bands = 496
+        band_names = [f'B{i}' for i in range(num_bands)] # check if even need to provide
+        #central_wvls = [] # check if even need to provide
+        #band_names_long = [] # check if even need to provide
+
+        def fwhm_to_sigma(self, fwhm):
+            return fwhm / (2 * np.sqrt(2 * np.log(2)))
+        
+        def read_srf_from_xls(self, fpath_srf: Path):
+            """
+            Reads spectral response function from csv document
+
+            :param fpath_srf:
+                file-path to the csv document containing the SRF values per band
+            :returns:
+                SRF values per wavelength [nm] and Hyspex band as DataFrame
+
+            """
+            hyspex_sensor = pd.read_csv(fpath_srf, sep=';')
+  
+            # Wavelength range for ProSAIL
+            wavelengths = np.arange(400, 2501, 1)
+
+            band_responses = {}
+
+            for i, row in hyspex_sensor.iterrows():
+                center = row['wvl']
+                sigma = self.fwhm_to_sigma(row['fwhm'])
+                response = np.exp(-0.5 * ((wavelengths - center) / sigma) ** 2)
+                band_responses[f'Hyspex_{i+1}'] = response
+
+            # Combine all responses into a single DataFrame
+            srf = pd.DataFrame(band_responses)
+            srf.insert(0, 'wvl', wavelengths)
+
+            return srf

@@ -151,7 +151,10 @@ def generate_spectra_soil(
     sensor_suffix = '_S2B'
   elif rtm_config['sensor'] == 'PlanetSuperDove':
     sensor_suffix = '_PL'
+  elif rtm_config['sensor'] == 'Hyspex':
+    sensor_suffix = '_hyspex'
   
+
   pheno_phases = \
       lut_params.name.split('.csv')[0] + sensor_suffix
 
