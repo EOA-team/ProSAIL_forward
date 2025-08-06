@@ -164,9 +164,7 @@ class Sensors(object):
         defines hypersectral drone
         """
         num_bands = 496
-        band_names = [f'B{i}' for i in range(num_bands)] # check if even need to provide
-        #central_wvls = [] # check if even need to provide
-        #band_names_long = [] # check if even need to provide
+        band_names = [f'B{i}' for i in range(num_bands)]
 
         def fwhm_to_sigma(self, fwhm):
             return fwhm / (2 * np.sqrt(2 * np.log(2)))
@@ -193,6 +191,40 @@ class Sensors(object):
                 sigma = self.fwhm_to_sigma(row['fwhm'])
                 response = np.exp(-0.5 * ((wavelengths - center) / sigma) ** 2)
                 band_responses[f'Hyspex_{i+1}'] = response
+
+            # Combine all responses into a single DataFrame
+            srf = pd.DataFrame(band_responses)
+            srf.insert(0, 'wvl', wavelengths)
+
+            return srf
+
+
+    class Raw:
+        """
+        just keesp the hyperspectal data as it is, simuated from Prosail
+        """
+        num_bands = 2101
+        band_names = [f'B{i+1}' for i in range(num_bands)] 
+        
+        def read_srf_from_xls(self, fpath_srf: Path):
+            """
+            Reads spectral response function from csv document
+
+            :param fpath_srf:
+            :returns:
+                SRF values for leaving the spectrum raw (1 for the band, 0 elsewhere)
+
+            """
+            center_wvls = np.arange(400, 2501, 1)
+  
+            # Wavelength range for ProSAIL
+            wavelengths = np.arange(400, 2501, 1)
+
+            band_responses = {}
+            # Create delta-function SRFs (1 at center, 0 elsewhere)
+            for i, center in enumerate(center_wvls):
+                response = (wavelengths == int(round(center))).astype(float)
+                band_responses[f'Raw_{i+1}'] = response
 
             # Combine all responses into a single DataFrame
             srf = pd.DataFrame(band_responses)

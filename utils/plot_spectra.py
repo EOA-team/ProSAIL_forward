@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-lut_path = '../results/prosail_danner-etal_switzerland_soil_hyspex_lai-cab-ccc-car_lut.pkl'
+lut_path = '../results/prosail_danner-etal_switzerland_soil_hyspex_lai-cab-ccc-car_lut_debug2.pkl'
 trait = 'lai'
 
 df = pd.read_pickle(lut_path)
@@ -17,14 +17,14 @@ df = pd.read_pickle(lut_path)
 cols_traits = ['n', 'cab', 'car', 'ant', 'cbrown', 'cw', 'cm', 'prot', 'cbc', 'lai', 'lidfa',\
     'hspot', 'rsoil', 'psoil', 'tts', 'tto', 'psi', 'lidfb', 'typelidf', 'ccc']
 cols_bands = [c for c in df.columns if c.startswith('B')]
-wvl = pd.read_csv('../data/mjolnir_wvl_fwhm.csv', sep=';')['wvl'].tolist()
+wvl = pd.read_csv('../data/mjolnir_wvl_fwhm.csv', sep=';')['wvl'].tolist() # np.arange(400,2501,1) # 
 
 
 
 fig, axs = plt.subplots(nrows=7, ncols=2, figsize=(14, 20))
 
 min_val, max_val = np.floor(df[trait].min()), np.ceil(df[trait].max())
-thresholds = np.linspace(min_val, max_val, 8)
+thresholds = np.arange(min_val, max_val, 1)
 
 for i in range(len(thresholds) - 1):
     lower, upper = thresholds[i], thresholds[i + 1]
@@ -34,11 +34,11 @@ for i in range(len(thresholds) - 1):
 
     # Plot individual sampled spectra
     axs[i, 0].plot(wvl, sample[cols_bands].T, linestyle='-')
-    axs[i, 0].set_title(f'S2 spectra for {trait} {lower:.5f}-{upper:.5f}')
+    axs[i, 0].set_title(f'Spectra for {trait} {lower:.5f}-{upper:.5f}')
     axs[i, 0].set_xlabel('Wavelength (nm)')
     axs[i, 0].set_ylabel('Reflectance')
     axs[i, 0].set_ylim(0, 1)  
-    axs[i, 0].set_xlim(400, 2300)
+    axs[i, 0].set_xlim(400, 2500)
 
     # Plot mean spectrum
     mean_spectrum = df_tr[cols_bands].mean()
@@ -47,7 +47,7 @@ for i in range(len(thresholds) - 1):
     axs[i, 1].set_xlabel('Wavelength (nm)')
     axs[i, 1].set_ylabel('Reflectance')
     axs[i, 1].set_ylim(0, 1)  
-    axs[i, 1].set_xlim(400, 2300)
+    axs[i, 1].set_xlim(400, 2500)
 
     plt.tight_layout()
     plt.savefig(f'Hyspex_spectra_{trait}.png')

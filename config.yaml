@@ -4,12 +4,12 @@ LUT:
     sampling_method: 'FRS'
     apply_glai_ccc_constraint: false
     apply_chlorophyll_carotiniod_constraint: false
-    codistribution: 'lut_params/codistribution.csv'
+    codistribution: null #'lut_params/codistribution.csv'
     
 
 RTM:
     sensor : 'Hyspex' # among ['Sentinel2A', 'Sentinel2B', 'PlanetSuperDove', 'Hyspex']
-    fpath_srf : 'data/mjolnir_wvl_fwhm.csv' #'data/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.1.xlsx' for Sentinel-2
+    fpath_srf : 'data/mjolnir_wvl_fwhm.csv' #'data/S2-SRF_COPE-GSEG-EOPG-TN-15-0007_3.1.xlsx'   for Sentinel-2
     remove_invalid_green_peaks : true
     linearize_lai : false
     

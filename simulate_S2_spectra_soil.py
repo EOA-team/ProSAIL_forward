@@ -93,9 +93,8 @@ def generate_spectra(
       lut_params.name.split('.csv')[0] + sensor_suffix
 
   # generate lookup-table
-  trait_str = '-'.join(traits)
   fpath_lut = output_dir.joinpath(
-    f'{pheno_phases}_{trait_str}_lut.pkl') 
+    f'{pheno_phases}_lut.pkl') 
   print('Output path', fpath_lut)
 
   # if LUT exists, continue, else generate it
@@ -159,9 +158,8 @@ def generate_spectra_soil(
       lut_params.name.split('.csv')[0] + sensor_suffix
 
   # generate lookup-table
-  trait_str = '-'.join(traits)
   fpath_lut = output_dir.joinpath(
-    f'{pheno_phases}_{trait_str}_lut.pkl') 
+    f'{pheno_phases}_lut.pkl') 
   print('Output path', fpath_lut)
 
   # if LUT exists, continue, else generate it
