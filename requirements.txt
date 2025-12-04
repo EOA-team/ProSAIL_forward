@@ -6,8 +6,8 @@ numpy
 pandas
 scipy
 seaborn
-sklearn
+scikit-lear
 spart-python
 spectral
 nvtx
-yaml
+PyYAML
